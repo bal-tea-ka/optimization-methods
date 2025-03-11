@@ -82,8 +82,7 @@ double bitwiseSearch(double a, double b, double epsilon) {
     return min_x;
 }
 
-// Метод дихотомии (бинарный поиск минимума функции)
-// a, b - границы интервала, e - точность, counter - счётчик итераций
+// Метод дихотомии
 float dichotomy(float a, float b, float e) {
     iter++;
     float en = (b - a) / 2; // Половина текущего интервала
@@ -107,8 +106,6 @@ float dichotomy(float a, float b, float e) {
 }
 
 // Метод золотого сечения для поиска минимума функции
-// a, b - границы интервала, tol - точность
-// Возвращает найденное значение x минимума функции
 double goldenSectionSearch(double a, double b, double tol) {
     const double phi = (sqrt(5) - 1) / 2;  // Коэффициент золотого сечения (~0.618)
 
@@ -181,7 +178,7 @@ double middle_point(double a, double b, double tol) {
     return (ak + bk) / 2;
 }
 
-
+// Метод хорд
 double chord_method(double a, double b, double tol) {
     double x_tilda;
     iter = 0;
@@ -222,6 +219,8 @@ double chord_method(double a, double b, double tol) {
     return (a + b) / 2; // Возвращаем середину оставшегося интервала
 }
 
+
+// Метод Ньютона
 double newton_method(double x0, double tol) {
     double x = x0; 
     iter = 0; // зануляем счетчик итераций
@@ -321,6 +320,6 @@ int main() {
     cin.ignore();
     system("cls");
     int temp = menu(a, b, tol); // заходим в меню, записываем какое значение она вернула
-    if (temp == -1) main(); // если функция меню вернула -1, то заново вызываем main и просим пользователя заново ввести границы
+    if (temp == -1) main(); // если функция меню вернула -1, то вызываем main
     return 0;
 }
