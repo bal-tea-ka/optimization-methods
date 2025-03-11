@@ -6,28 +6,28 @@ using namespace std;
 
 int iter = 0;
 
-// Функция для вычисления значения целевой функции
-// Возвращает значение функции (x^4)/4 - 2*x^2
+// Функция (x^4)/4 - 2*x^2
 double function(double x) {
     return (pow(x, 4) / 4) - 2 * pow(x, 2);
 }
 
-// Определение производной функции
+// Производная функции
 double derivative(double x) {
     return pow(x, 3) - 4 * x;
 }
 
+// Вторая производная функции
 double second_derivative(double x) {
     return 3 * pow(x, 2) - 4;
 }
 
-// Метод поразрядного поиска минимума
+// Метод поразрядного поиска
 double bitwiseSearch(double a, double b, double epsilon) {
     
     iter = 0;
 
     double step = (b - a) / 2; // Начальный шаг
-    double x = a;
+    double x = a; // Поиск начинается от левой границы массива
     double min_x = x;
     double min_f = function(x);
 
@@ -39,10 +39,10 @@ double bitwiseSearch(double a, double b, double epsilon) {
         cout << "Поиск вправо:\n\n";
         while (x + step <= b) {
             iter++;
-            x += step;
+            x += step; // Увеличиваем х
             double current_f = function(x);
             cout << "Итерация " << left << setw(4) << iter << " Шаг: " << left << setw(4) << step << " | x = " << left << setw(10) << x << " f(x) = " << left << setw(10) << current_f << "\n";
-            if (current_f < min_f) {
+            if (current_f < min_f) { // Сравниваем значения функции в новой и старой точках
                 min_f = current_f;
                 min_x = x;
             }
@@ -59,10 +59,10 @@ double bitwiseSearch(double a, double b, double epsilon) {
         // Поиск влево с уменьшенным шагом
         while (x - step >= a) {
             iter++;
-            x -= step;
-            double current_f = function(x);
+            x -= step; // Уменьшаем x
+            double current_f = function(x); // Находим значение функции в новой точке
             cout << "Итерация " << left << setw(4) << iter << " Шаг: " << left << setw(4) << step << " | x = " << left << setw(10) << x << " f(x) = " << left << setw(10) << current_f << "\n";
-            if (current_f < min_f) {
+            if (current_f < min_f) { // Сравниваем значения в новой и старой точках
                 min_f = current_f;
                 min_x = x;
             }
@@ -114,7 +114,7 @@ double goldenSectionSearch(double a, double b, double tol) {
     double f1 = function(x1);
     double f2 = function(x2);
 
-    iter = 0; // зануляем счетчик итераций
+    iter = 0; // Зануляем счетчик итераций
 
     while (fabs(b - a) > tol) { // Проверка условия точности
         iter++;
@@ -148,7 +148,7 @@ double middle_point(double a, double b, double tol) {
     double ak = a; // Начало интервала
     double bk = b; // Конец интервала
     double xk;     // Средняя точка интервала
-    iter = 0; // Счетчик итераций
+    iter = 0; // Зануляем счетчик итераций
 
     // Продолжаем сужать интервал, пока его длина не станет меньше 2*tol
     while ((bk - ak) / 2 > tol) {
@@ -181,7 +181,7 @@ double middle_point(double a, double b, double tol) {
 // Метод хорд
 double chord_method(double a, double b, double tol) {
     double x_tilda;
-    iter = 0;
+    iter = 0; // Зануляем счетчик итераций
     if (derivative(a) < 0 && derivative(b) < 0) return b;
     if (derivative(a) > 0 && derivative(b) > 0) return a;
     while (fabs(b - a) > tol) {
@@ -223,7 +223,7 @@ double chord_method(double a, double b, double tol) {
 // Метод Ньютона
 double newton_method(double x0, double tol) {
     double x = x0; 
-    iter = 0; // зануляем счетчик итераций
+    iter = 0; // Зануляем счетчик итераций
     while (abs(derivative(x)) > tol) { // Проверяем условие выхода из цикла
         iter++;
         cout << "Итерация " << left << setw(4) << iter
@@ -244,6 +244,7 @@ int menu(double a, double b, double tol) { // функция для вызова
     switch (c) {
     case 1:
         system("cls");
+        iter = 0; // Зануляем счетчик итераций
         cout << "Метод дихотомии\n\n";
         dichotomy(a, b, tol);
         cout << "\n";
@@ -300,7 +301,7 @@ int menu(double a, double b, double tol) { // функция для вызова
         system("cls");
         menu(a, b, tol);
         break;
-    default: // если ввели другое значение, функция возвращает -1
+    default: // Если ввели другое значение, функция возвращает -1
         return -1;
     }
 }
@@ -310,7 +311,7 @@ int main() {
     system("cls");
     double a, b; // Интервал поиска минимума
     double tol; // Точность
-    // ввод границ и точности с клавиатуры
+    // Ввод границ и точности с клавиатуры
     cout << "Введите левую границу: ";
     cin >> a;
     cout << "Введите правую границу: ";
@@ -319,7 +320,7 @@ int main() {
     cin >> tol;
     cin.ignore();
     system("cls");
-    int temp = menu(a, b, tol); // заходим в меню, записываем какое значение она вернула
-    if (temp == -1) main(); // если функция меню вернула -1, то вызываем main
+    int temp = menu(a, b, tol); // Заходим в меню, записываем какое значение она вернула
+    if (temp == -1) main(); // Если функция меню вернула -1, то вызываем main
     return 0;
 }
