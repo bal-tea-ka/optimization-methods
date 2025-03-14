@@ -1,8 +1,10 @@
-﻿#include <cmath>
 #include <iomanip>
 #include <iostream>
+#include <cmath>
 
 using namespace std;
+
+int max_iter = 150;
 
 int iter = 0;
 
@@ -23,7 +25,7 @@ double second_derivative(double x) {
 
 // Метод поразрядного поиска
 double bitwiseSearch(double a, double b, double epsilon) {
-    
+
     iter = 0;
 
     double step = (b - a) / 2; // Начальный шаг
@@ -39,6 +41,7 @@ double bitwiseSearch(double a, double b, double epsilon) {
         cout << "Поиск вправо:\n\n";
         while (x + step <= b) {
             iter++;
+            if (iter == max_iter) return min_x;
             x += step; // Увеличиваем х
             double current_f = function(x);
             cout << "Итерация " << left << setw(4) << iter << " Шаг: " << left << setw(4) << step << " | x = " << left << setw(10) << x << " f(x) = " << left << setw(10) << current_f << "\n";
@@ -53,12 +56,13 @@ double bitwiseSearch(double a, double b, double epsilon) {
 
         // Уменьшение шага
         step /= 2;
-        
+
         cout << "\nПоиск влево:\n\n";
 
         // Поиск влево с уменьшенным шагом
         while (x - step >= a) {
             iter++;
+            if (iter == max_iter) return min_x;
             x -= step; // Уменьшаем x
             double current_f = function(x); // Находим значение функции в новой точке
             cout << "Итерация " << left << setw(4) << iter << " Шаг: " << left << setw(4) << step << " | x = " << left << setw(10) << x << " f(x) = " << left << setw(10) << current_f << "\n";
@@ -83,13 +87,12 @@ double bitwiseSearch(double a, double b, double epsilon) {
 }
 
 // Метод дихотомии
-float dichotomy(float a, float b, float e) {
+double dichotomy(double a, double b, double e) {
     iter++;
-    float en = (b - a) / 2; // Половина текущего интервала
+    if (iter == max_iter) { cout << "\n------------\nИтераций - " << iter << endl;  return (a + b) / 2;}
     float E = 0.02;
-    if (en <= e) { // Условие остановки
-        cout << "\n------------\nИтераций - " << iter << "\nx = " << setw(15) << (a + b) / 2 << " f(x) = " << function((a + b) / 2);
-        return 0;
+    if ((b - a) / 2 <= e) { // Условие остановки
+        cout << "\n------------\nИтераций - " << iter << endl;  return (a + b) / 2;
     }
     float x1 = (a + b - E) / 2;
     float x2 = (a + b + E) / 2;
@@ -115,11 +118,12 @@ double goldenSectionSearch(double a, double b, double tol) {
     double f2 = function(x2);
 
     iter = 0; // Зануляем счетчик итераций
-
+    
     while (fabs(b - a) > tol) { // Проверка условия точности
         iter++;
+        if (iter == max_iter) return (a + b) / 2;
         cout << "Итерация " << left << setw(4) << iter
-             << "| a = " << left << setw(15) << a << " b = " << left << setw(15) << b
+            << "| a = " << left << setw(15) << a << " b = " << left << setw(15) << b
             << " x1 = " << left << setw(15) << x1 << " x2 = " << left << setw(15) << x2
             << " f(x1) = " << left << setw(15) << f1 << " f(x2) = " << left << setw(14) << f2 << endl;
 
@@ -156,6 +160,8 @@ double middle_point(double a, double b, double tol) {
         double df_xk = derivative(xk); // Вычисляем производную в средней точке
         iter++;
 
+        if (iter == max_iter) return xk;
+
         // Вывод текущего значения x, значения функции и количества итераций
         cout << "Итерация " << left << setw(4) << iter << left << setw(5) << "| a = " << left << setw(15) << ak << "b = " << left << setw(15) << bk << "x = " << left << setw(15) << xk << "f'(x) = " << left << setw(15) << derivative(xk) << endl;
 
@@ -186,6 +192,8 @@ double chord_method(double a, double b, double tol) {
     if (derivative(a) > 0 && derivative(b) > 0) return a;
     while (fabs(b - a) > tol) {
         iter++; // Увеличиваем счётчик итераций
+
+        if (iter == max_iter) return x_tilda;
         // Проверка на деление на ноль
         if (fabs(derivative(a) - derivative(b)) < 1e-9) {
             cerr << "Ошибка: деление на ноль при вычислении x_tilda" << endl;
@@ -222,105 +230,91 @@ double chord_method(double a, double b, double tol) {
 
 // Метод Ньютона
 double newton_method(double x0, double tol) {
-    double x = x0; 
+    double x = x0;
     iter = 0; // Зануляем счетчик итераций
     while (abs(derivative(x)) > tol) { // Проверяем условие выхода из цикла
         iter++;
+
+        if (iter == max_iter) return x;
         cout << "Итерация " << left << setw(4) << iter
             << "| x = " << left << setw(15) << x << "f'(x) = " << left << setw(15) << derivative(x) << "f''(x) = " << left << setw(15) << second_derivative(x) << "f(x) = " << left << setw(15) << function(x) << endl; // Выводим итерации
         if (fabs(second_derivative(x)) < 1e-9) { cout << "Вторая производная слишком мала для данного метода"; return -1; } // Защита от деления на ноль
         x = x - (derivative(x) / second_derivative(x)); // Вычисляем следующее значение x
-        
+
     }
     return x; // Возвращаем последнее найденное значение
 }
 
-int menu(double a, double b, double tol) { // функция для вызова меню
-    cout << "Метод дихотомии -> 1\nМетод золотого сечения -> 2\nМетод поразрядного поиска -> 3\nМетод средней точки -> 4\nМетод хорд -> 5\nМетод Ньютона -> 6\n\nДля ввода других границ интеравала или точности введите любое другое значение\n\n";
+int menu(double a, double b, double e) { // функция для вызова меню
+    cout << "Метод дихотомии -> 1\nМетод золотого сечения -> 2\nМетод поразрядного поиска -> 3\nМетод средней точки -> 4\nМетод хорд -> 5\nМетод Ньютона -> 6\nВвод максимального количества итераций -> 7\n\nДля ввода других границ интеравала или точности введите любое другое значение\n\n";
     int c;
     cin >> c;
     cin.ignore();
+    system("cls");
+    bool flag = true;
     double min_x = 0;
     switch (c) {
-    case 1:
-        system("cls");
-        iter = 0; // Зануляем счетчик итераций
+    case 1: {
         cout << "Метод дихотомии\n\n";
-        dichotomy(a, b, tol);
-        cout << "\n";
-        system("pause");
-        system("cls");
-        menu(a, b, tol);
+        iter = 0;
+        min_x = dichotomy(a, b, e);
         break;
-    case 2:
-        system("cls");
+    }
+    case 2: {
         cout << "Метод золотого сечения\n\n";
-        min_x = goldenSectionSearch(a, b, tol);
-        cout << "x = " << setw(15) << min_x << " f(x) = " << setw(10) << function(min_x) << endl;
-        system("pause");
-        system("cls");
-        menu(a, b, tol);
+        min_x = bitwiseSearch(a, b, e);
         break;
-    case 3:
-        system("cls");
+    }
+    case 3: {
         cout << "Метод поразрядного поиска\n\n";
-        min_x = bitwiseSearch(a, b, tol);
-        cout << "x = " << setw(15) << min_x << " f(x) = " << setw(10) << function(min_x) << endl;
-        system("pause");
-        system("cls");
-        menu(a, b, tol);
+        min_x = goldenSectionSearch(a, b, e);
         break;
-    case 4:
-        system("cls");
+    }
+    case 4: {
         cout << "Метод средней точки\n\n";
-        min_x = middle_point(a, b, tol);
-        cout << "x = " << setw(15) << min_x << " f(x) = " << setw(10) << function(min_x) << endl;
-        system("pause");
-        system("cls");
-        menu(a, b, tol);
+        min_x = middle_point(a, b, e);
         break;
-    case 5:
-        system("cls");
+    }
+    case 5: {
         cout << "Метод хорд\n\n";
-        min_x = chord_method(a, b, tol);
-        cout << "x = " << left << setw(15) << min_x << " f(x) = " << left << setw(10) << function(min_x) << endl;
-        system("pause");
-        system("cls");
-        menu(a, b, tol);
+        min_x = chord_method(a, b, e);
         break;
+    }
     case 6:
-        system("cls");
-        int x0;
+        double x0;
         cout << "Введите начальное приближение: ";
         cin >> x0;
-        system("cls");
         cout << "Метод Ньютона\n\n";
-        min_x = newton_method(x0, tol);
-        cout << "x = " << left << setw(15) << min_x << " f(x) = " << left << setw(10) << function(min_x) << endl;
-        system("pause");
-        system("cls");
-        menu(a, b, tol);
+        min_x = newton_method(x0, e);
         break;
-    default: // Если ввели другое значение, функция возвращает -1
-        return -1;
+    case 7: 
+        cout << "Максимальное кол-во итераций сейчас: " << max_iter << endl;
+        cout << "Введите максимальное количество итераций: ";
+        cin >> max_iter;
+        flag = false;
+        break;
+    default: return -1;
     }
+    if (flag) { cout << endl << "x = " << min_x << " f(x) = " << function(min_x) << endl; system("pause"); }
+    system("cls");
+    menu(a, b, e);
 }
 
 int main() {
     setlocale(LC_ALL, "RU"); // Устанавливаем русскую локализацию
     system("cls");
     double a, b; // Интервал поиска минимума
-    double tol; // Точность
+    double e; // Точность
     // Ввод границ и точности с клавиатуры
     cout << "Введите левую границу: ";
     cin >> a;
     cout << "Введите правую границу: ";
     cin >> b;
     cout << "Введите нужную точность: ";
-    cin >> tol;
+    cin >> e;
     cin.ignore();
     system("cls");
-    int temp = menu(a, b, tol); // Заходим в меню, записываем какое значение она вернула
+    int temp = menu(a, b, e); // Заходим в меню, записываем какое значение она вернула
     if (temp == -1) main(); // Если функция меню вернула -1, то вызываем main
     return 0;
 }
